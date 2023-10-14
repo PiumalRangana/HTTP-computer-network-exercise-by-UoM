@@ -30,7 +30,7 @@ def get_message_length(decaded_data:str) -> int:
     for i in  head_items[1:]:
         items = i.split(":")
         head_items_dictionary[items[0]]=items[1]     
-    return int(head_items_dictionary['Content-Length'])
+    return int(head_items_dictionary['Content-Length']) , head
         
 #HTTP GET request is specific:
 #1. One space between GET and path, and another one space between path and version
@@ -48,16 +48,19 @@ while True:
     data = con.recv(BUF_SIZE)
     decaded_data = data.decode("utf-8")
     if new_message:
-        message_length = get_message_length(decaded_data)
+        message_length , head = get_message_length(decaded_data)
         new_message = False
 
     else:
         full_message += decaded_data
     
     if message_length <= len(full_message):
+        print(head)
         con.close()
         break
 
+print("-"*100)
+print(full_message)
 
 #Here, we do not retreive the entire file.
 #We are happy with only first part of the file. 
@@ -66,9 +69,6 @@ while True:
 #It is an exercise for you to retreive entire file as chunks.
 #If needed, you can just observe the Content-Length in the Response header, 
 #Then retreive the entier file as suited. (Either expand BUF_SIZE or receive and print as chunks)
-
-print("-"*100)
-print(full_message)
 
 #Expected output: HTTP/1.1 200 OK with additional headers, 
 #Followed by \n\n (Two new lines to mark the end of the header, and then the content)
